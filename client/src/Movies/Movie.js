@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import MovieCard from "./MovieCard";
+
 export default class Movie extends React.Component {
   constructor(props) {
     super(props);
@@ -31,7 +32,7 @@ export default class Movie extends React.Component {
     addToSavedList(this.state.movie);
   };
 
-  render() {
+  render(props) {
     if (!this.state.movie) {
       return <div>Loading movie information...</div>;
     }
@@ -42,6 +43,11 @@ export default class Movie extends React.Component {
         <div className="save-button" onClick={this.saveMovie}>
           Save
         </div>
+        <button
+        onClick={() => props.history.push(`/update-movie/${savedList.id}`)}
+        >
+        Edit
+        </button>
       </div>
     );
   }
