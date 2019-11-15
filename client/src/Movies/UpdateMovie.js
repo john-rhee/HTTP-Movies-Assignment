@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const initialItem = {
-    id: 0,
+    
     title: '',
     director: '',
     metascore: 0,
@@ -10,29 +10,38 @@ const initialItem = {
 };
 
 const UpdateMovie = props => {
-    const [item, setItem] = useState(initialItem);
-
+    const [movies, setMovies] = useState(initialItem);
+    console.log(props);
     const changeHandler = e => {
         e.persist();
         let value = e.target.value;
         if (e.target.name === "metascore") {
           value = parseInt(value, 10);
         }
-        setItem({
-          ...item,
+        setMovies({
+          ...movies,
           [e.target.name]: value
         });
     };
+
+    useEffect(() => {
+        // Solves refresh race condition
+        if (props.savedList.length > 0) {
+          const newMovie = props.savedList.find(
+            thing => `${thing.id}` === props.match.params.id
+          );
+          setMovies(newMovie);
+        }
+      }, [props.savedList, props.match.params.id]);
 
     const handleSubmit = e => {
         // PUT request
         e.preventDefault();
         axios
-          .put(`http://localhost:5000/api/movies/${item.id}`, item)
+          .put(`http://localhost:5000/api/movies/${movies.id}`, movies)
           .then(res => {
-            props.updateList(res.data);
-            console.log('history', props.history)
-            props.history.push("/movies");
+            // props.setSavedList(res.data);
+            props.history.push(`/`);
           })
           .catch(err => console.log(err));
     };
@@ -50,7 +59,7 @@ return (
           name="title"
           onChange={changeHandler}
           placeholder="title"
-          value={item.title}
+          value={movies.title}
         />
 
         <input
@@ -58,7 +67,7 @@ return (
           name="director"
           onChange={changeHandler}
           placeholder="director"
-          value={item.director}
+          value={movies.director}
         />
 
         <input
@@ -66,7 +75,7 @@ return (
           name="metascore"
           onChange={changeHandler}
           placeholder="metascore"
-          value={item.metascore}
+          value={movies.metascore}
         />
 
         {/* <input
